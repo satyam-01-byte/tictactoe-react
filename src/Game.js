@@ -1,7 +1,8 @@
 import "./Game.css";
+import Board from "./Board";
 
 function Game() {
-  return <h1>Game</h1>;
+  return <Board />;
 }
 
 export default Game;
