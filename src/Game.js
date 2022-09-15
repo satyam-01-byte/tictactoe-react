@@ -10,6 +10,8 @@ class Game extends React.Component {
       history: [
         {
           squares: Array(9).fill(null),
+          row: -1,
+          col: -1,
         },
       ],
       stepNumber: 0,
@@ -24,11 +26,15 @@ class Game extends React.Component {
     if (findWinner(squares) || squares[i]) {
       return;
     }
+    const row = Math.floor(i / 3);
+    const col = i % 3;
     squares[i] = this.state.xIsNext ? "X" : "O";
     this.setState({
       history: history.concat([
         {
           squares: squares,
+          row: row,
+          col: col,
         },
       ]),
       stepNumber: history.length,
@@ -41,6 +47,11 @@ class Game extends React.Component {
       stepNumber: step,
       xIsNext: step % 2 === 0,
     });
+    this.state.history.map((step, move) => {
+      document.getElementById(move).classList.remove("moveBtnClicked");
+      return null;
+    });
+    document.getElementById(step).classList.add("moveBtnClicked");
   }
 
   render() {
@@ -49,20 +60,31 @@ class Game extends React.Component {
     const winner = findWinner(current.squares);
 
     const moves = history.map((step, move) => {
-      const desc = move ? "Go to move #" + move : "Go to game start";
+      let desc;
+      if (move) {
+        desc = "Go to move #" + move;
+        if (step.row !== -1) {
+          desc += " (" + step.row + ", " + step.col + ")";
+        }
+      } else desc = "Go to game start";
+
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button
+            id={`${move}`}
+            className="moveBtn"
+            onClick={() => this.jumpTo(move)}
+          >
+            {desc}
+          </button>
         </li>
       );
     });
 
     let status;
-    if (winner) {
-      status = "Winner: " + winner;
-    } else {
-      status = "Next player: " + (this.state.xIsNext ? "X" : "O");
-    }
+
+    if (winner) status = "Winner: " + winner;
+    else status = "Next player: " + (this.state.xIsNext ? "X" : "O");
 
     return (
       <div className="game">
